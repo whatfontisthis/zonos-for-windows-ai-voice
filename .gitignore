@@ -7,8 +7,26 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
+venv/
+
+# Model cache (auto-downloaded)
+huggingface/
+torch/
+
+# Output files
+narration_output/
+*.wav
+*.mp3
+
+# Temp files
+*.tmp
+find_large_files.ps1
+
+# IDE
+.idea/
+.vscode/
+*.swp
 
 # Misc.
 .ipynb_checkpoints/
-huggingface/

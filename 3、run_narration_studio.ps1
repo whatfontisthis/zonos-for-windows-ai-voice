@@ -1,4 +1,5 @@
-# run script by @bdsqlsz, A-N-I-K (Fixed for PowerShell cmd.exe issue)
+# Narration Studio launcher
+# Based on run_gradio.ps1
 
 # Find where the latest MSVC is installed dynamically
 $vswherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -12,22 +13,17 @@ if (Test-Path $vswherePath) {
     Write-Host "ERROR: vswhere.exe not found! Please ensure Visual Studio is installed." -ForegroundColor Red
 }
 
-# Ensure the path is valid - FIXED: Use Invoke-Expression instead of cmd.exe pipe
+# Ensure the path is valid
 if (Test-Path $vcvarsPath) {
     Write-Host "Setting up MSVC environment..." -ForegroundColor Yellow
-    # Method 1: Direct batch execution (cleaner)
     & cmd /c "`"$vcvarsPath`" && set" | ForEach-Object {
         if ($_ -match "^(.*?)=(.*)$") {
             Set-Item -Path "env:$($matches[1])" -Value "$($matches[2])"
         }
     }
-    
-    # Alternative Method 2 (if above fails): Call & run environment commands
-    # & cmd /c "`"$vcvarsPath`""
-    # $env:PATH = [Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")
 } else {
     Write-Host "ERROR: vcvars64.bat could not be found! Please make sure MSVC is installed properly." -ForegroundColor Red
-    Write-Host "Continuing without MSVC (Gradio still works)..." -ForegroundColor Yellow
+    Write-Host "Continuing without MSVC..." -ForegroundColor Yellow
 }
 
 # Activate python venv
@@ -54,16 +50,14 @@ elseif (Test-Path "./.venv/bin/activate") {
 
 $Env:HF_HOME = $PSScriptRoot + "\huggingface"
 $Env:TORCH_HOME = $PSScriptRoot + "\torch"
-#$Env:HF_ENDPOINT = "https://hf-mirror.com"
 $Env:XFORMERS_FORCE_DISABLE_TRITON = "1"
 $Env:CUDA_HOME = "${env:CUDA_PATH}"
 $Env:PHONEMIZER_ESPEAK_LIBRARY = "C:\Program Files\eSpeak NG\libespeak-ng.dll"
 $Env:GRADIO_HOST = "127.0.0.1"
 
-Write-Host "Starting Gradio interface for Zonos..." -ForegroundColor Green
-Write-Host "Compatible with RTX 5090 + PyTorch nightly cu128" -ForegroundColor Cyan
-Write-Host "Zyphra/Zonos-v0.1-transformer loading... (Mamba-SSM optional)" -ForegroundColor Cyan
+Write-Host "Starting Narration Studio..." -ForegroundColor Green
+Write-Host "Batch TTS with multi-voice support" -ForegroundColor Cyan
 
-python -m gradio_interface
+python narration_studio.py
 
 Read-Host "Press Enter to exit" | Out-Null

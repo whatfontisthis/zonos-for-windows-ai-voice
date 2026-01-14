@@ -1,5 +1,7 @@
 import torch
 import torchaudio
+import soundfile as sf
+import numpy as np
 import gradio as gr
 from os import getenv
 
@@ -145,14 +147,24 @@ def generate_audio(
     if speaker_audio is not None and "speaker" not in unconditional_keys:
         if speaker_audio != SPEAKER_AUDIO_PATH:
             print("Recomputed speaker embedding")
-            wav, sr = torchaudio.load(speaker_audio)
+            wav_data, sr = sf.read(speaker_audio)
+            wav = torch.from_numpy(wav_data).float()
+            if wav.dim() == 1:
+                wav = wav.unsqueeze(0)  # Add channel dimension
+            elif wav.dim() == 2:
+                wav = wav.T  # soundfile uses (frames, channels), we need (channels, frames)
             SPEAKER_EMBEDDING = selected_model.make_speaker_embedding(wav, sr)
             SPEAKER_EMBEDDING = SPEAKER_EMBEDDING.to(device, dtype=torch.bfloat16)
             SPEAKER_AUDIO_PATH = speaker_audio
 
     audio_prefix_codes = None
     if prefix_audio is not None:
-        wav_prefix, sr_prefix = torchaudio.load(prefix_audio)
+        wav_prefix_data, sr_prefix = sf.read(prefix_audio)
+        wav_prefix = torch.from_numpy(wav_prefix_data).float()
+        if wav_prefix.dim() == 1:
+            wav_prefix = wav_prefix.unsqueeze(0)  # Add channel dimension
+        elif wav_prefix.dim() == 2:
+            wav_prefix = wav_prefix.T  # soundfile uses (frames, channels), we need (channels, frames)
         wav_prefix = wav_prefix.mean(0, keepdim=True)
         wav_prefix = selected_model.autoencoder.preprocess(wav_prefix, sr_prefix)
         wav_prefix = wav_prefix.to(device, dtype=torch.float32)
