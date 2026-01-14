@@ -76,7 +76,33 @@ uv run gradio_interface.py
 ~~_For repeated sampling we highly recommend using the gradio interface instead, as the minimal example needs to load the model every time it is run._~~
 
 ### Windows Gradio interface (recommended)
-Powershell run with `2、run_gui.ps1` (right click then choose `use powershell run`)
+Powershell run with `2、run_gradio.ps1` (right click then choose `use powershell run`)
+
+### Narration Studio (Batch Script Automation)
+
+For narrating longer scripts, use the **Narration Studio** - a batch TTS tool with multi-voice support.
+
+```bash
+# Launch with PowerShell
+3、run_narration_studio.ps1
+```
+
+**Features:**
+- Load scripts from file or paste text
+- Auto-split into sentences for natural narration
+- Support multiple voice samples (assign different voices per sentence)
+- Generate/regenerate individual sentences
+- Preview audio for each sentence
+- Merge and export as MP3 or WAV
+
+**Workflow:**
+1. **Setup**: Load your script → Click "Split into Sentences"
+2. **Add Voices**: Upload voice samples with names (e.g., "Narrator", "Character1")
+3. **Assign**: Click sentences to assign different voices (optional)
+4. **Generate**: Click "Generate All" to process the entire script
+5. **Export**: Adjust silence gap → Export as MP3
+
+This automates the manual process of generating audio sentence-by-sentence and merging with ffmpeg.
 
 ## Features
 
